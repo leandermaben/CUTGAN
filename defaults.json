@@ -16,5 +16,6 @@
     "mssl_mag_weight":1,
     "mssl_logmag_weight":1,
     "metrics_temp_cache":"/content/CUTGAN/temp",
-    "load_size":128
+    "load_size":128,
+    "annotations":"/content/drive/MyDrive/NTU - Speech Augmentation/annotations.csv"
 }
