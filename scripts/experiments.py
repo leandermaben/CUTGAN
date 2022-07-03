@@ -29,8 +29,8 @@ def validate(name, epochs, data_cache, results_dir):
 
     for epoch in epochs:
         run(f'python test.py --split val --dataroot data_cache --name {name} --CUT_mode CUT --phase train --state Test --checkpoints_dir /content/drive/MyDrive/APSIPA/Results/checkpoints --results_dir {results_dir} --epoch {epoch}')
-        avg_lsd,std_lsd = lsd(os.path.join(data_cache,'noisy','val'),os.path.join(results_dir,name,'audios',f'val_{epoch}','fake_B'),use_gender=False)
-        avg_mssl,std_mssl = mssl(os.path.join(data_cache,'noisy','val'),os.path.join(results_dir,name,'audios',f'val_{epoch}','fake_B'),use_gender=False)
+        avg_lsd,std_lsd = lsd(os.path.join(data_cache,'noisy','val'),os.path.join(results_dir,name,f'val_{epoch}','audios','fake_B'),use_gender=False)
+        avg_mssl,std_mssl = mssl(os.path.join(data_cache,'noisy','val'),os.path.join(results_dir,name,f'val_{epoch}','audios','fake_B'),use_gender=False)
 
         info['avg_val_lsd'].append(avg_lsd)
         info['std_val_lsd'].append(std_lsd)
@@ -58,14 +58,14 @@ def apsipa_exp(names,csv_path,sources, data_cache='/content/CUTGAN/data_cache',r
         print('#'*25)
         print(f'Training {name} with Data from {source}')
         shutil.copytree(os.path.join('/content/drive/MyDrive/APSIPA/Data_Sources',source),data_cache)
-        #run(f'python train.py --split train --dataroot data_cache --name {name} --CUT_mode CUT --display_id 0 --state Train --checkpoints_dir /content/drive/MyDrive/APSIPA/Results/checkpoints --no_html')
+        run(f'python train.py --split train --dataroot data_cache --name {name} --CUT_mode CUT --display_id 0 --state Train --checkpoints_dir /content/drive/MyDrive/APSIPA/Results/checkpoints --no_html')
         
         info = validate(name, epochs, data_cache, results_dir)
         for metric in ['min_lsd_epoch','min_mssl_epoch']:
             epoch = info[metric]
             run(f'python test.py --split test --dataroot data_cache --name {name} --CUT_mode CUT --phase train --state Test --checkpoints_dir /content/drive/MyDrive/APSIPA/Results/checkpoints --results_dir {results_dir} --epoch {epoch}')
-            info[f'avg_test_lsd_{metric}'],info[f'std_test_lsd_{metric}'] = lsd(os.path.join(data_cache,'noisy',f'test_{epoch}','test'),os.path.join(results_dir,name,'audios','fake_B'),use_gender=False)
-            info[f'avg_test_mssl_{metric}'],info[f'std_test_mssl_{metric}'] = mssl(os.path.join(data_cache,'noisy',f'test_{epoch}','test'),os.path.join(results_dir,name,'audios','fake_B'),use_gender=False)
+            info[f'avg_test_lsd_{metric}'],info[f'std_test_lsd_{metric}'] = lsd(os.path.join(data_cache,'noisy','test'),os.path.join(results_dir,name,f'test_{epoch}','audios','fake_B'),use_gender=False)
+            info[f'avg_test_mssl_{metric}'],info[f'std_test_mssl_{metric}'] = mssl(os.path.join(data_cache,'noisy','test'),os.path.join(results_dir,name,f'test_{epoch}','audios','fake_B'),use_gender=False)
 
             if info['min_mssl_epoch'] == info['min_lsd_epoch']:
                 info['avg_test_lsd_min_mssl_epoch'] = info['avg_test_lsd_min_lsd_epoch']
@@ -90,9 +90,9 @@ if __name__ == '__main__':
         df.to_csv(csv_path,index=False)
     
 
-    sources = ['Non-Parallel/TIMIT_Helicopter']
-    apsipa_exp([f'CUTGAN_{i}' for i in ['np_helicopter']],csv_path,sources)
-    # ,'Non-Parallel/TIMIT_Cabin','Non-Parallel/Codec2' ,'np_cabin','np_cd2'
+    sources = ['Non-Parallel/TIMIT_Cabin','Non-Parallel/Codec2']
+    apsipa_exp([f'CUTGAN_{i}' for i in ['np_cabin','np_cd2']],csv_path,sources)
+
 
 
 
